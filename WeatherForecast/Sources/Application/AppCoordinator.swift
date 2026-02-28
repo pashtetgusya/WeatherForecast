@@ -1,5 +1,4 @@
 import UIKit
-import Swinject
 
 // MARK: - Application coodrinator
 
@@ -9,7 +8,7 @@ import Swinject
     
     // MARK: Properties
     
-    let diContainer: Container
+    let diContainer: AppDIContainer
     var childCoordinators: [Coordinator] = []
     var navController: UINavigationController
     var didFinish: ((Coordinator) -> Void)?
@@ -20,7 +19,7 @@ import Swinject
     /// - Parameter diContainer: контейнер с зависимостями.
     /// - Parameter navController: навигационный контроллер.
     init(
-        di diContainer: Container,
+        di diContainer: AppDIContainer,
         navController: UINavigationController
     ) {
         self.diContainer = diContainer
@@ -35,12 +34,12 @@ import Swinject
 extension AppCoordinator: Coordinator {
     
     func start() {
-        guard
-            let launchViewController = diContainer.resolve(LaunchViewController.self)
-        else { fatalError("LaunchViewController not registered in DI container") }
-        
+        let viewController = LaunchAssembly.build(
+            locationService: diContainer.locationService,
+            coordinator: self
+        )
         navController.setNavigationBarHidden(true, animated: false)
-        navController.viewControllers = [launchViewController]
+        navController.viewControllers = [viewController]
     }
     
     func resetToRoot() -> Self {
@@ -55,13 +54,10 @@ extension AppCoordinator: Coordinator {
 extension AppCoordinator: LaunchCoordinator {
     
     func presentWeatherView(for userLocation: UserLocation) {
-        guard
-            let viewController = diContainer.resolve(
-                WeatherViewController.self,
-                argument: userLocation
-            )
-        else { fatalError("WeatherViewController not registered in DI container") }
-        
+        let viewController = WeatherAssembly.build(
+            userLocation: userLocation,
+            weatherService: diContainer.weatherService
+        )
         navController.pushViewController(viewController, animated: true)
     }
 }

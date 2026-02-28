@@ -1,5 +1,4 @@
 import UIKit
-import Swinject
 
 // MARK: - Application delegate
 
@@ -9,7 +8,7 @@ import Swinject
     
     var window: UIWindow?
     
-    private var appDIContainer: Container?
+    private var appDIContainer: AppDIContainer?
     private var appCoordinator: Coordinator?
 }
 
@@ -35,16 +34,18 @@ private extension AppDelegate {
     
     /// Выполняет настройку контейнера с зависимостями приложения.
     func setupAppDIContainer() {
-        let container = Container()
-        appDIContainer = container
-        
-        let appAssembly = AppAssembly()
-        appAssembly.assemble(in: container)
+        appDIContainer = AppDIContainer()
     }
     
     /// Выполняет настройку координатора приложения.
     func setupAppCoordinator() {
-        appCoordinator = appDIContainer?.resolve(AppCoordinator.self)
+        guard let appDIContainer else { return }
+        
+        let navController = UINavigationController()
+        appCoordinator = AppCoordinator(
+            di: appDIContainer,
+            navController: navController
+        )
         appCoordinator?.start()
     }
     

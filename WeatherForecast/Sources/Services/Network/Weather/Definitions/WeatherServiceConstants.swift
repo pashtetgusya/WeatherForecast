@@ -10,5 +10,5 @@ enum WeatherServiceConstants {
     /// Доменное имя для выполнения запросов к `API`.
     static let host: String = "api.weatherapi.com"
     /// Ключ для выполнения запросов к `API`.
-    static let key: String = "fa8b3df74d4042b9aa7135114252304"
+    static let key: String = Bundle.main.object(forInfoDictionaryKey: "WeatherAPIKey") as? String ?? ""
 }

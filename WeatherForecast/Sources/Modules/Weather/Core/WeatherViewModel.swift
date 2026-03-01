@@ -50,9 +50,6 @@ extension WeatherViewModel {
             do {
                 state = .loading
                 
-                let calendar = Calendar.current
-                let dateFormatter = DateFormatter()
-                let currentDateTimeInterval = Int(Date.now.timeIntervalSince1970)
                 let currentWeatherDTO = try await weatherService.getCurrentWeather(
                     latitude: userLocation.coordinate.latitude,
                     longitude: userLocation.coordinate.longitude
@@ -63,33 +60,30 @@ extension WeatherViewModel {
                     days: 3
                 )
                 
-                guard
-                    let averageForecastDTO = weatherForecastDTO.dailyForecasts.dailyForecastsDTO
-                        .first(where: {
-                            calendar.isDateInToday(dateFormatter.date(from: $0.date) ?? .now)
-                        })?
-                        .averageForecast
-                else { return }
-                
                 let currentWeahterSection = WeatherModel.Section(
                     type: .currentWeather,
                     rows: [.currentWeather(model: WeatherModel.CurrentWeather(
                         currentWeatherDTO: currentWeatherDTO,
-                        averageForecastDTO: averageForecastDTO
+                        averageForecastDTO: weatherForecastDTO.dailyForecasts.dailyForecastsDTO[0].averageForecast
                     ))]
                 )
-                let hourlyWeatherSections = weatherForecastDTO.dailyForecasts.dailyForecastsDTO.map { dailyForecastDTO in
-                    let hourlyWeatherModels = dailyForecastDTO.hourlyForecasts
-                        .filter { $0.timeEpoch > currentDateTimeInterval }
-                        .map { WeatherModel.HourlyWeather(hourlyWeaherDTO: $0) }
-                    let hourlyWeatherSection = WeatherModel.Section(
-                        type: .hourlyWeather(day: dailyForecastDTO.date),
-                        rows: hourlyWeatherModels.map { .hourlyWeather(model: $0) }
-                    )
-                    
-                    return hourlyWeatherSection
-                }
-                let weatherSections = [currentWeahterSection] + hourlyWeatherSections
+                
+                let currentDateTimeInterval = Int(Date.now.timeIntervalSince1970)
+                let hourlyWeatherTodayModels = weatherForecastDTO.dailyForecasts.dailyForecastsDTO[0]
+                    .hourlyForecasts
+                    .filter { $0.timeEpoch > currentDateTimeInterval }
+                    .map { WeatherModel.HourlyWeather(hourlyWeaherDTO: $0) }
+                let hourlyWeatherTomorrowModels = weatherForecastDTO.dailyForecasts.dailyForecastsDTO[1]
+                    .hourlyForecasts[0...(24 - hourlyWeatherTodayModels.count)]
+                    .map { WeatherModel.HourlyWeather(hourlyWeaherDTO: $0) }
+                
+                let hourlyWeatherModels = hourlyWeatherTodayModels + hourlyWeatherTomorrowModels
+                let hourlyWeatherSection = WeatherModel.Section(
+                    type: .hourlyWeather,
+                    rows: hourlyWeatherModels.map { .hourlyWeather(model: $0) }
+                )
+                
+                let weatherSections = [currentWeahterSection] + [hourlyWeatherSection]
                 state = .loaded(weahterSections: weatherSections)
             }
             catch {

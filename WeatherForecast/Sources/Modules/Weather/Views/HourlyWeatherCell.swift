@@ -18,7 +18,7 @@ final class HourlyWeatherCell: UICollectionViewCell {
     
     // MARK: Properties
     
-    private let measurementFormatter = MeasurementFormatter()
+    private let measurementFormatter = MeasurementFormatter.celsius
     
     // MARK: Initialization
     
@@ -62,7 +62,7 @@ extension HourlyWeatherCell {
         let tempMeasurement = Measurement(value: model.temperature, unit: UnitTemperature.celsius)
         tempLabel.text = measurementFormatter.string(from: tempMeasurement)
         hourLabel.text = model.time
-        iconImageView.kf.setImage(with: URL(string: model.iconURL))
+        iconImageView.kf.setImage(with: model.iconURL)
     }
 }
 

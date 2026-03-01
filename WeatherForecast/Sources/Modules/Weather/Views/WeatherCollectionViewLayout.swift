@@ -52,7 +52,7 @@ private extension WeatherCollectionViewLayout {
     }
     
     /// Создает секцию с горизонтальным скроллом и небольшими ячейками.
-     static func createHorizontalScrollSection() -> NSCollectionLayoutSection {
+    static func createHorizontalScrollSection() -> NSCollectionLayoutSection {
         let itemLayoutSize = NSCollectionLayoutSize(
             widthDimension: .absolute(60),
             heightDimension: .absolute(110)

@@ -14,7 +14,7 @@ final class CurrentWeatherCell: UICollectionViewCell {
     
     // MARK: Properties
     
-    private let measurementFormatter = MeasurementFormatter()
+    private let measurementFormatter = MeasurementFormatter.celsius
     
     // MARK: Initialization
     

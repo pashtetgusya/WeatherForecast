@@ -18,7 +18,8 @@ enum WeatherModel {
             // MARK: Cases
             
             case currentWeather
-            case hourlyWeather(day: String)
+            case hourlyWeather
+            case dailyWeather
         }
         
         // MARK: Section row
@@ -75,7 +76,7 @@ enum WeatherModel {
         
         let time: String
         let temperature: Double
-        let iconURL: String
+        let iconURL: URL?
         
         // MARK: Initialization
         
@@ -84,11 +85,11 @@ enum WeatherModel {
             let timeInterval = TimeInterval(hourlyWeaherDTO.timeEpoch)
             let date = Date(timeIntervalSince1970: timeInterval)
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "HH:mm"
+            dateFormatter.dateFormat = "HH"
             
             self.time = dateFormatter.string(from: date)
             self.temperature = hourlyWeaherDTO.temperatureInCelsius
-            self.iconURL = "https://" + String(hourlyWeaherDTO.weatherType.iconURL.dropFirst(2))
+            self.iconURL = URL(string: "https://" + String(hourlyWeaherDTO.weatherType.iconURL.dropFirst(2)))
         }
     }
 }

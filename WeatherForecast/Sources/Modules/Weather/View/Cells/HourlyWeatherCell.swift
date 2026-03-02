@@ -6,10 +6,6 @@ import Kingfisher
 /// Ячейка отображения прогноза погоды за час.
 final class HourlyWeatherCell: UICollectionViewCell {
     
-    // MARK: Sublayers
-    
-    private let backgroundGradientLayer = CAGradientLayer()
-    
     // MARK: Subviews
     
     private let hourLabel = UILabel()
@@ -38,12 +34,6 @@ final class HourlyWeatherCell: UICollectionViewCell {
 // MARK: - Life cycle
 
 extension HourlyWeatherCell {
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        backgroundGradientLayer.frame = contentView.bounds
-    }
     
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -75,23 +65,10 @@ private extension HourlyWeatherCell {
         contentView.addSubview(hourLabel)
         contentView.addSubview(tempLabel)
         contentView.addSubview(iconImageView)
-        
-        contentView.layer.insertSublayer(backgroundGradientLayer, at: 0)
     }
     
     /// Выполняет настройку `view`-компонентов.
     func setupAppearance() {
-        contentView.clipsToBounds = true
-        contentView.layer.cornerRadius = 25
-        
-        backgroundGradientLayer.colors = [
-            UIColor(resource: .cardBlueGradient).cgColor,
-            UIColor(resource: .cardLightBlueGradient).cgColor
-        ]
-        backgroundGradientLayer.locations = [0.0, 1.0]
-        backgroundGradientLayer.startPoint = CGPoint(x: 0.0, y: 1.0)
-        backgroundGradientLayer.endPoint = CGPoint(x: 1.0, y: 0.0)
-        
         hourLabel.textAlignment = .center
         hourLabel.textColor = .init(resource: .whiteText)
         hourLabel.font = .systemFont(ofSize: 14, weight: .bold)

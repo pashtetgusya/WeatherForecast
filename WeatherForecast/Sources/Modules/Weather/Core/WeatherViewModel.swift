@@ -13,7 +13,7 @@ final class WeatherViewModel {
         
         case idle
         case loading
-        case loaded(weahterSections: [WeatherModel.Section])
+        case loaded(weahterSections: [WeatherCollectionViewModel.Section])
         case errorLoading
     }
     
@@ -60,8 +60,8 @@ extension WeatherViewModel {
                     days: 3
                 )
                 
-                let currentWeahterSection = WeatherModel.Section(
-                    type: .currentWeather,
+                let currentWeahterSection = WeatherCollectionViewModel.Section(
+                    kind: .currentWeather,
                     rows: [.currentWeather(model: WeatherModel.CurrentWeather(
                         currentWeatherDTO: currentWeatherDTO,
                         averageForecastDTO: weatherForecastDTO.dailyForecasts.dailyForecastsDTO[0].averageForecast
@@ -78,12 +78,19 @@ extension WeatherViewModel {
                     .map { WeatherModel.HourlyWeather(hourlyWeaherDTO: $0) }
                 
                 let hourlyWeatherModels = hourlyWeatherTodayModels + hourlyWeatherTomorrowModels
-                let hourlyWeatherSection = WeatherModel.Section(
-                    type: .hourlyWeather,
+                let hourlyWeatherSection = WeatherCollectionViewModel.Section(
+                    kind: .hourlyWeather,
                     rows: hourlyWeatherModels.map { .hourlyWeather(model: $0) }
                 )
                 
-                let weatherSections = [currentWeahterSection] + [hourlyWeatherSection]
+                let dailyWeatherModels = weatherForecastDTO.dailyForecasts.dailyForecastsDTO
+                    .map { WeatherModel.DailyWeahter(dailyForecastDTO: $0) }
+                let dailyWeatherSection = WeatherCollectionViewModel.Section(
+                    kind: .dailyWeather,
+                    rows: dailyWeatherModels.map { .dailyWeather(model: $0) }
+                )
+                
+                let weatherSections = [currentWeahterSection, hourlyWeatherSection, dailyWeatherSection]
                 state = .loaded(weahterSections: weatherSections)
             }
             catch {

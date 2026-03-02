@@ -5,41 +5,7 @@ import Foundation
 /// Модель экрана прогноза погоды.
 enum WeatherModel {
     
-    // MARK: Section
-    
-    /// Структура, описывающия секцию прогноза погоды.
-    struct Section {
-        
-        // MARK: Section type
-        
-        /// Тип секции прогноза погоды.
-        enum `Type`: Hashable {
-            
-            // MARK: Cases
-            
-            case currentWeather
-            case hourlyWeather
-            case dailyWeather
-        }
-        
-        // MARK: Section row
-        
-        /// Ячейка секции прогноза погоды.
-        enum Row: Hashable {
-            
-            // MARK: Cases
-            
-            case currentWeather(model: WeatherModel.CurrentWeather)
-            case hourlyWeather(model: WeatherModel.HourlyWeather)
-        }
-        
-        // MARK: Properties
-        
-        let type: Section.`Type`
-        let rows: [Section.Row]
-    }
-    
-    // MARK: Current weather row model
+    // MARK: Current weather model
     
     /// Структура, описывающая прогноз погоды на текущий момент времени.
     struct CurrentWeather: Hashable {
@@ -67,7 +33,7 @@ enum WeatherModel {
         }
     }
     
-    // MARK: Hourly weather row model
+    // MARK: Hourly weather model
     
     /// Структура, описывающая прогноз погоды за час.
     struct HourlyWeather: Hashable {
@@ -82,14 +48,46 @@ enum WeatherModel {
         
         /// Создает новый экземпляр структуры.
         init(hourlyWeaherDTO: DailyWeatherDTO.DailyForecastsDTO.DailyForecastDTO.HourlyForecastDTO) {
-            let timeInterval = TimeInterval(hourlyWeaherDTO.timeEpoch)
+            let timeInterval = TimeInterval(hourlyWeaherDTO.timeEpoch - 1)
             let date = Date(timeIntervalSince1970: timeInterval)
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "HH"
             
-            self.time = dateFormatter.string(from: date)
+            self.time = Calendar.current.isDate(.now, equalTo: date, toGranularity: .hour)
+                        ? "Now"
+                        : dateFormatter.string(from: date)
             self.temperature = hourlyWeaherDTO.temperatureInCelsius
             self.iconURL = URL(string: "https://" + String(hourlyWeaherDTO.weatherType.iconURL.dropFirst(2)))
+        }
+    }
+    
+    // MARK: Daily weather
+    
+    /// Структура, описывающая прогноз погоды за день.
+    struct DailyWeahter: Hashable {
+        
+        // MARK: Properties
+        
+        let date: String
+        let minTemperature: Double
+        let maxTemperature: Double
+        let iconURL: URL?
+        
+        // MARK: Initialization
+        
+        /// Создает новый экземпляр структуры.
+        init(dailyForecastDTO: DailyWeatherDTO.DailyForecastsDTO.DailyForecastDTO) {
+            let timeInterval = TimeInterval(dailyForecastDTO.dateEpoch)
+            let date = Date(timeIntervalSince1970: timeInterval)
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "EEEE"
+            
+            self.date = Calendar.current.isDateInToday(date)
+                        ? "Today"
+                        : dateFormatter.string(from: date)
+            self.minTemperature = dailyForecastDTO.averageForecast.minTemperatureInCelcius
+            self.maxTemperature = dailyForecastDTO.averageForecast.maxTemperatureInCelcius
+            self.iconURL = URL(string: "https://" + String(dailyForecastDTO.averageForecast.weatherType.iconURL.dropFirst(2)))
         }
     }
 }

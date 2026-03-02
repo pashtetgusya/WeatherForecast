@@ -96,6 +96,7 @@ private extension WeatherView {
         
         collectionView.registerCell(CurrentWeatherCell.self)
         collectionView.registerCell(HourlyWeatherCell.self)
+        collectionView.registerCell(DailyWeatherCell.self)
     }
     
     /// Выполняет настройку констрейнтов.
@@ -105,8 +106,8 @@ private extension WeatherView {
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: topAnchor),
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor)
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12)
         ])
     }
 }
